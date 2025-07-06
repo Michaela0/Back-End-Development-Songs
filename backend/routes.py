@@ -51,3 +51,29 @@ def parse_json(data):
 ######################################################################
 # INSERT CODE HERE
 ######################################################################
+@app.route('/health')
+def get_health():
+    return jsonify({'status': 'ok'})
+
+@app.route('/count')
+def get_count():
+    return jsonify({'count': 20})
+
+@app.route('/song', methods=['GET'])
+def songs():
+    fetched_songs = db.songs.find({})
+    songs_list = []
+    for song in fetched_songs:
+        if 'id' in song:
+            song.pop('id')
+        songs_list.append(song)
+    return jsonify({'songs': songs_list}), 200
+
+@app.route('/song/<id>', methods=['GET'])
+def get_song_by_id(id):
+    song = db.songs.find_one({"id": int(id)})
+    if not song:
+        return jsonify({'message': 'song with id not found'}), 404
+    song['_id'] = str(song['_id'])  # convert ObjectId to string
+    return jsonify(song), 200
+
