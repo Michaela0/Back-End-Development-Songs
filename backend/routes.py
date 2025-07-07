@@ -51,6 +51,8 @@ def parse_json(data):
 ######################################################################
 # INSERT CODE HERE
 ######################################################################
+
+# GET routes
 @app.route('/health')
 def get_health():
     return jsonify({'status': 'ok'})
@@ -77,3 +79,19 @@ def get_song_by_id(id):
     song['_id'] = str(song['_id'])  # convert ObjectId to string
     return jsonify(song), 200
 
+# POST routes
+@app.route('/song', methods=['POST'])
+def create_song():
+    song = request.get_json()  # Extract JSON from request body
+    
+    if not song or 'id' not in song:
+        return jsonify({"message": "Invalid song data or missing 'id'"}), 400
+
+    # Check if song with same id already exists
+    existing_song = db.songs.find_one({"id": song['id']})
+    if existing_song:
+        return jsonify({"message": f"song with id {song['id']} already present"}), 302
+
+    # Insert the new song
+    result = db.songs.insert_one(song)
+    return jsonify({"message": "Song created", "id": str(result.inserted_id)}), 201
