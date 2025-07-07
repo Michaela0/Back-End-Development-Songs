@@ -79,7 +79,7 @@ def get_song_by_id(id):
     song['_id'] = str(song['_id'])  # convert ObjectId to string
     return jsonify(song), 200
 
-# POST routes
+# POST - add new song
 @app.route('/song', methods=['POST'])
 def create_song():
     song = request.get_json()  # Extract JSON from request body
@@ -95,3 +95,37 @@ def create_song():
     # Insert the new song
     result = db.songs.insert_one(song)
     return jsonify({"message": "Song created", "id": str(result.inserted_id)}), 201
+
+# POST - update existing song
+@app.route('/song/<int:id>', methods=['PUT'])
+def update_song(id):
+    # Get JSON data from request
+    song = request.get_json()
+
+    # Find existing song by id
+    existing_song = db.songs.find_one({'id': id})
+    if not existing_song:
+        return jsonify({'message': 'song not found'}), 404
+
+    # Update the song document with new data
+    db.songs.update_one({'id': id}, {'$set': song})
+
+    # Retrieve the updated song
+    updated_song = db.songs.find_one({'id': id})
+    updated_song['_id'] = str(updated_song['_id'])  # Convert ObjectId to string for JSON serialization
+
+    # Return updated song as JSON response
+    return jsonify(updated_song), 200
+
+# DELETE a song endpoint
+@app.route('/song/<int:id>', methods=['DELETE'])
+def delete_song(id):
+    # Attempt to delete the song with the given id
+    result = db.songs.delete_one({'id': id})
+
+    if result.deleted_count == 0:
+        # No song found with this id
+        return jsonify({'message': 'song not found'}), 404
+
+    # Song deleted successfully, return 204 No Content with empty body
+    return '', 204
