@@ -1,38 +1,37 @@
 #!/bin/bash
 echo "****************************************"
-echo " Setting up Capstone Environment"
+echo " Resetting and Setting up Capstone Environment"
 echo "****************************************"
 
-echo "Installing Python 3.9 and Virtual Environment"
+echo "Removing existing virtual environment if any..."
+rm -rf ~/venv
+
+echo "Installing Python 3.9 and virtual environment tools..."
 sudo apt-get update
 sudo DEBIAN_FRONTEND=noninteractive apt-get install -y python3.9 python3.9-venv
 
-echo "Checking the Python version..."
-python3.9 --version
-
-echo "Creating a Python virtual environment"
+echo "Creating a new Python virtual environment..."
 python3.9 -m venv ~/venv
 
-echo "Configuring the developer environment..."
-echo "# DevOps Capstone Project additions" >> ~/.bashrc
-echo "export GITHUB_ACCOUNT=$GITHUB_ACCOUNT" >> ~/.bashrc
-echo 'export PS1="\[\e]0;\u:\W\a\]${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u\[\033[00m\]:\[\033[01;34m\]\W\[\033[00m\]\$ "' >> ~/.bashrc
+echo "Activating the virtual environment..."
+source ~/venv/bin/activate
+
+echo "Upgrading pip and wheel..."
+pip install --upgrade pip wheel
+
+echo "Installing Python dependencies from requirements.txt..."
+pip install -r requirements.txt
+
+echo "Installing pytest..."
+pip install pytest
+
+echo "Setting up automatic activation in .bashrc..."
+sed -i '/source ~\/venv\/bin\/activate/d' ~/.bashrc  # Remove old line if exists
 echo "source ~/venv/bin/activate" >> ~/.bashrc
 
-echo "Installing Python dependencies..."
-source ~/venv/bin/activate && python3.9 -m pip install --upgrade pip wheel
-source ~/venv/bin/activate && pip install -r requirements.txt
-source ~/venv/bin/activate && pip install pytest  # Add this line for pytest
-
-echo "Starting the Postgres Docker container..."
-make db
-
-echo "Checking the Postgres Docker container..."
-docker ps
-
 echo "****************************************"
-echo " Capstone Environment Setup Complete"
+echo " Capstone Environment Reset and Setup Complete"
 echo "****************************************"
 echo ""
-echo "Use 'exit' to close this terminal and open a new one to initialize the environment"
+echo "Please open a new terminal or run 'source ~/.bashrc' to activate the environment."
 echo ""

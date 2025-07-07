@@ -5,7 +5,8 @@ pymongo
 
 # Build dependencies
 Flask==2.1.2
-Flask-SQLAlchemy==2.5.1
+Flask-SQLAlchemy==2.1.0
+flask-appbuilder==1.9.2
 psycopg2-binary==2.9.3
 python-dotenv==0.20.0
 Flask-Talisman
