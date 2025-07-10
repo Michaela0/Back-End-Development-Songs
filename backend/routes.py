@@ -68,8 +68,11 @@ def songs():
     for song in fetched_songs:
         if 'id' in song:
             song.pop('id')
+        # Convert ObjectId to string here
+        song['_id'] = str(song['_id'])
         songs_list.append(song)
     return jsonify({'songs': songs_list}), 200
+
 
 @app.route('/song/<id>', methods=['GET'])
 def get_song_by_id(id):
